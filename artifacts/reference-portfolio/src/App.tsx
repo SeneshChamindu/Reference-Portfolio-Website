@@ -278,12 +278,12 @@ function Home() {
               <p className="work-note">A selection of products, tools, and experiments built to solve real problems.</p>
             </div>
             <div className="project-grid">
-              <ProjectCard index="01" type="android app / featured" title="Sriboard App" description="Sinhala and English keyboard for Android with real-time translation, voice typing, theme studio, events, and more." tags={['Android', 'Java', 'Kotlin']} art="art-keyboard" delay="delay-1" />
-              <ProjectCard index="02" type="wallpapers / featured" title="WallGenix" description="Premium 4K aesthetic wallpapers for mobile with vertical backgrounds, dark mode, anime, and daily inspiration." tags={['Next.js', 'PWA', 'Design']} art="art-wallpaper" delay="delay-2" />
-              <ProjectCard index="03" type="automation / featured" title="Prabath-MD" description="A powerful multi-device WhatsApp assistant built for useful automations, downloads, replies, and community tools." tags={['Node.js', 'Baileys', 'WebSocket']} art="art-automation" delay="delay-2" />
-              <ProjectCard index="04" type="developer tools" title="Next API" description="Small, focused APIs that help builders move from an idea to a working product without unnecessary friction." tags={['Next.js', 'API', 'Open Source']} art="art-api" delay="delay-3" />
-              <ProjectCard index="05" type="media platform" title="MovSL" description="A simple way to discover and enjoy local entertainment, built around speed, clarity, and a better browsing experience." tags={['React', 'Content', 'UX']} art="art-media" delay="delay-2" />
-              <ProjectCard index="06" type="developer tool" title="Subtitle TRT" description="A fast subtitle translation utility designed for creators who need to make their work accessible to more people." tags={['Python', 'Tools', 'Creators']} art="art-subtitle" delay="delay-3" />
+              <ProjectCard index="01" type="android app / featured" title="Sriboard App" description="Sinhala and English keyboard for Android with real-time translation, voice typing, theme studio, events, and more." url="https://sriboard.prabath.top/" tags={['Android', 'Java', 'Kotlin']} art="art-keyboard" delay="delay-1" />
+              <ProjectCard index="02" type="wallpapers / featured" title="WallGenix" description="Premium 4K aesthetic wallpapers for mobile with vertical backgrounds, dark mode, anime, and daily inspiration." url="https://wallgenix.prabath.top/" tags={['Next.js', 'PWA', 'Design']} art="art-wallpaper" delay="delay-2" />
+              <ProjectCard index="03" type="automation / featured" title="Prabath-MD" description="A powerful multi-device WhatsApp assistant built for useful automations, downloads, replies, and community tools." url="https://md.prabath.top/" tags={['Node.js', 'Baileys', 'WebSocket']} art="art-automation" delay="delay-2" />
+              <ProjectCard index="04" type="developer tools" title="Next API" description="Small, focused APIs that help builders move from an idea to a working product without unnecessary friction." url="https://api.prabath.top/" tags={['Next.js', 'API', 'Open Source']} art="art-api" delay="delay-3" />
+              <ProjectCard index="05" type="media platform" title="MovSL" description="A simple way to discover and enjoy local entertainment, built around speed, clarity, and a better browsing experience." url="https://movsl.prabath.top/" tags={['React', 'Content', 'UX']} art="art-media" delay="delay-2" />
+              <ProjectCard index="06" type="developer tool" title="Subtitle TRT" description="A fast subtitle translation utility designed for creators who need to make their work accessible to more people." url="https://subtr.prabath.top/" tags={['Python', 'Tools', 'Creators']} art="art-subtitle" delay="delay-3" />
             </div>
           </div>
         </section>
@@ -350,8 +350,8 @@ function Home() {
           <div className="footer-copy">© 2025 Prabath Kumara / built with curiosity</div>
           <div className="footer-links">
             <a href="mailto:hello@prabath.top" aria-label="Email Prabath" data-testid="footer-email"><Mail size={16} /></a>
-            <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub" data-testid="footer-github"><Github size={16} /></a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn" data-testid="footer-linkedin"><Linkedin size={16} /></a>
+            <a href="https://github.com/prabathLK" target="_blank" rel="noreferrer" aria-label="GitHub" data-testid="footer-github"><Github size={16} /></a>
+            <a href="https://www.linkedin.com/in/prabath-kumara-b0353953" target="_blank" rel="noreferrer" aria-label="LinkedIn" data-testid="footer-linkedin"><Linkedin size={16} /></a>
             <a href="#top" aria-label="Back to top" data-testid="footer-top"><ArrowDown size={16} style={{ transform: 'rotate(180deg)' }} /></a>
           </div>
         </div>
@@ -444,14 +444,15 @@ type ProjectCardProps = {
   type: string;
   title: string;
   description: string;
+  url: string;
   tags: string[];
   art: string;
   delay: string;
 };
 
-function ProjectCard({ index, type, title, description, tags, art, delay }: ProjectCardProps) {
+function ProjectCard({ index, type, title, description, url, tags, art, delay }: ProjectCardProps) {
   return (
-    <article className={`project-card reveal ${delay}`} data-testid={`card-project-${index}`}>
+    <a className={`project-card reveal ${delay}`} href={url} target="_blank" rel="noreferrer" aria-label={`Open ${title}`} data-testid={`card-project-${index}`}>
       <div className={`project-art ${art}`}>
         <span className="project-index">{index} — 0{Number(index) + 1}</span>
         <span className="project-window"><ExternalLink size={12} /></span>
@@ -463,7 +464,7 @@ function ProjectCard({ index, type, title, description, tags, art, delay }: Proj
         <p className="project-desc">{description}</p>
         <div className="project-tags">{tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
       </div>
-    </article>
+    </a>
   );
 }
 
