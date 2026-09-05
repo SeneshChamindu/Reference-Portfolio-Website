@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { ClerkProvider, Show, SignIn, SignUp, useClerk, useUser } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
@@ -25,6 +25,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
+import centerPhoto from '@assets/walvers-w_6a56445c36dfe_1788627977453.jpg';
 import {
   Route,
   Redirect,
@@ -95,7 +96,10 @@ const clerkAppearance = {
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [musicPosition, setMusicPosition] = useState<{ left: number; top: number } | null>(null);
   const audioNodesRef = useRef<{ context: AudioContext; gain: GainNode; oscillators: OscillatorNode[] } | null>(null);
+  const musicDragRef = useRef<{ offsetX: number; offsetY: number; startX: number; startY: number } | null>(null);
+  const musicDidDragRef = useRef(false);
 
   useEffect(() => {
     const revealItems = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
@@ -141,6 +145,36 @@ function Home() {
     setSoundOn(next);
   };
 
+  const handleMusicPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    musicDragRef.current = {
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+    musicDidDragRef.current = false;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleMusicPointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (!musicDragRef.current) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const nextLeft = Math.max(12, Math.min(window.innerWidth - rect.width - 12, event.clientX - musicDragRef.current.offsetX));
+    const nextTop = Math.max(84, Math.min(window.innerHeight - rect.height - 12, event.clientY - musicDragRef.current.offsetY));
+    if (Math.abs(event.clientX - musicDragRef.current.startX) > 3 || Math.abs(event.clientY - musicDragRef.current.startY) > 3) {
+      musicDidDragRef.current = true;
+    }
+    setMusicPosition({ left: nextLeft, top: nextTop });
+  };
+
+  const handleMusicPointerUp = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    musicDragRef.current = null;
+  };
+
   return (
     <div className="portfolio-page">
       <header className="site-header">
@@ -155,10 +189,6 @@ function Home() {
             <a href="#about" data-testid="link-about">About</a>
             <a href="#contact" data-testid="link-contact">Contact</a>
           </nav>
-          <button className={`soundtrack-control ${soundOn ? 'playing' : ''}`} onClick={toggleSound} aria-pressed={soundOn} data-testid="button-sound">
-            {soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
-            <span>{soundOn ? 'sound on' : 'sound off'}</span>
-          </button>
           <AuthActions />
           <button className="menu-toggle" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" data-testid="button-menu">
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -178,6 +208,29 @@ function Home() {
         </div>
       </header>
 
+      <button
+        className={`floating-music ${soundOn ? 'playing' : ''}`}
+        style={musicPosition ? { left: `${musicPosition.left}px`, top: `${musicPosition.top}px`, bottom: 'auto', transform: 'none' } : undefined}
+        onPointerDown={handleMusicPointerDown}
+        onPointerMove={handleMusicPointerMove}
+        onPointerUp={handleMusicPointerUp}
+        onPointerCancel={handleMusicPointerUp}
+        onClick={() => {
+          if (musicDidDragRef.current) {
+            musicDidDragRef.current = false;
+            return;
+          }
+          void toggleSound();
+        }}
+        aria-label={soundOn ? 'Turn ambient music off' : 'Turn ambient music on'}
+        aria-pressed={soundOn}
+        title="Click to toggle music. Drag to move."
+        data-testid="button-floating-music"
+      >
+        <span className="floating-music-icon">{soundOn ? <Volume2 size={19} /> : <VolumeX size={19} />}</span>
+        <span className="floating-music-waves" aria-hidden="true"><i /><i /><i /><i /></span>
+      </button>
+
       <main id="top">
         <section className="hero">
           <div className="hero-inner section-inner">
@@ -187,8 +240,12 @@ function Home() {
               <p className="hero-subtitle">I build useful digital products, tools, and experiences for people who want to move faster and make more impact.</p>
             </div>
             <div className="hero-stage" aria-label="Prabath's digital workspace">
-              <div className="stage-glow" />
-              <div className="stage-core"><span>PK</span></div>
+              <div className="stage-photo">
+                <img src={centerPhoto} alt="A quiet night journey by train" />
+                <span className="photo-vignette" />
+                <span className="photo-scan" />
+                <span className="photo-caption">visual diary / 01</span>
+              </div>
               <span className="stage-chip one">BUILD / SHIP</span>
               <span className="stage-chip two">IDEA + CODE</span>
               <span className="stage-chip three">ONLINE</span>
@@ -201,11 +258,6 @@ function Home() {
               <span>Available for select work</span>
             </div>
           </div>
-          <button className="hero-soundtrack" onClick={toggleSound} data-testid="hero-sound">
-            <span className="soundtrack-icon">{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />}</span>
-            <span>{soundOn ? 'ambient mode on' : 'enable ambient mode'}</span>
-            <span className="sound-wave"><i /><i /><i /><i /></span>
-          </button>
           <a className="hero-scroll" href="#work" data-testid="link-scroll-work">explore the work <ArrowDown size={15} /></a>
         </section>
 
