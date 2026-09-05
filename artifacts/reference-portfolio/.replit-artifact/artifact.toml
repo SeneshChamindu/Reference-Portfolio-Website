@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Reference Portfolio Website"
+description = "A cinematic personal portfolio website inspired by the provided reference, with editable identity, work, writing, and contact content for the user to make their own."
+version = "1.0.0"
+id = "artifacts/reference-portfolio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19390
+
+[services.development]
+run = "pnpm --filter @workspace/reference-portfolio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/reference-portfolio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/reference-portfolio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19390"
+BASE_PATH = "/"
