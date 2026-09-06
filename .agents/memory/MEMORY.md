@@ -1,0 +1,1 @@
+- [Vite preview build environment](vite-preview-build-env.md) — manual artifact builds need the workflow port and preview base path.
